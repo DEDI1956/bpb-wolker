@@ -201,7 +201,6 @@
       font-size: 1.46rem;
       margin-bottom: 2px;
     }
-    /* Cart Modal & Checkout & Notif */
     #cartModal, #checkoutPage, #notifModal, #productDetailModal {
       display:none; 
       position:fixed;
@@ -278,7 +277,6 @@
       color:#aaa;
       cursor:pointer;
     }
-    /* Checkout Page */
     .checkout-header {
       font-weight:bold;
       font-size:1.18rem;
@@ -313,7 +311,6 @@
       display:block;
       width:100%;
     }
-    /* Notif Page */
     .notif-title {
       font-weight:bold;
       font-size:1.12rem;
@@ -466,7 +463,7 @@
   </div>
 
   <script>
-    // Kategori & Produk
+    // ---------- KATEGORI & PRODUK ----------
     const categories = [
       { name: "Elektronik", icon: "💡" },
       { name: "Fashion", icon: "👗" },
@@ -477,7 +474,10 @@
       { name: "Ibu & Anak", icon: "🍼" },
       { name: "Lainnya", icon: "➕" }
     ];
-    const products = [
+
+    // Produk diambil dari localStorage (kunci: 'products')
+    // Jika belum ada, isi produk default agar katalog tidak kosong
+    const defaultProducts = [
       { name:"Headphone Bluetooth", price:85000, category:"Elektronik", desc:"Headphone bluetooth dengan suara jernih, baterai tahan lama, dan desain nyaman digunakan.", img:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80" },
       { name:"Jaket Hoodie Pria", price:95000, category:"Fashion", desc:"Jaket hoodie pria bahan adem, cocok untuk santai maupun bepergian.", img:"https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80" },
       { name:"Sepatu Sneakers Wanita", price:120000, category:"Fashion", desc:"Sneakers wanita trendi dan nyaman dipakai sehari-hari.", img:"https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" },
@@ -489,7 +489,19 @@
       { name:"Burger Daging Sapi", price:22000, category:"Makanan", desc:"Burger daging sapi homemade, siap makan.", img:"https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=400&q=80" },
       { name:"Susu UHT 1L", price:18000, category:"Makanan", desc:"Susu UHT 1 liter, cocok untuk sarapan keluarga.", img:"https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" }
     ];
-    // Keranjang & Notif
+    function ensureProductsInStorage() {
+      if (!localStorage.getItem('products')) {
+        localStorage.setItem('products', JSON.stringify(defaultProducts));
+      }
+    }
+    ensureProductsInStorage();
+
+    let products = [];
+    function loadProducts() {
+      products = JSON.parse(localStorage.getItem('products') || '[]');
+    }
+
+    // Keranjang & Notif seperti sebelumnya
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     function updateCartCount() {
       document.getElementById('cartCount').textContent = cart.length ? `(${cart.length})` : '';
@@ -500,6 +512,7 @@
       updateCartCount();
       showToast('Ditambahkan ke keranjang!');
     }
+
     // ---------- KATEGORI ----------
     const catContainer = document.getElementById("categories");
     let selectedCategory = "Semua";
@@ -524,10 +537,12 @@
         };
       });
     }
+
     // ---------- PRODUK ----------
     const prodContainer = document.getElementById("products");
     let searchQuery = '';
     function renderProducts() {
+      loadProducts();
       let filtered = products.filter(p =>
         (selectedCategory === 'Semua' || p.category === selectedCategory) &&
         (searchQuery === '' ||
@@ -561,6 +576,7 @@
       searchQuery = this.value.trim().toLowerCase();
       renderProducts();
     });
+
     // ---------- PRODUK DETAIL ----------
     function openProductDetail(product) {
       document.getElementById('detailImg').src = product.img;
@@ -576,6 +592,7 @@
     function closeProductDetail() {
       document.getElementById('productDetailModal').style.display = 'none';
     }
+
     // ---------- KERANJANG & CHECKOUT ----------
     function openCart() {
       let cartModal = document.getElementById('cartModal');
@@ -665,6 +682,7 @@
       }
     }
     updateCartCount();
+
     // ---------- NOTIFIKASI ----------
     function showNotifDot() {
       let notif = JSON.parse(localStorage.getItem('notif') || '[]');
@@ -705,6 +723,7 @@
         `;
       });
     }
+
     // ---------- LOGIN/LOGOUT DUMMY ----------
     let user = JSON.parse(localStorage.getItem('user') || 'null');
     function updateLoginText() {
@@ -733,6 +752,7 @@
       loginLogout();
     };
     updateLoginText();
+
     // ---------- NAVIGATION ----------
     document.getElementById('navHome').onclick = function(e){ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});};
     document.getElementById('navKategori').onclick = function(e){ e.preventDefault(); catContainer.scrollIntoView({behavior:'smooth'});};
@@ -741,6 +761,7 @@
       e.preventDefault();
       openCart();
     };
+
     // ---------- TOAST ----------
     function showToast(msg) {
       let t = document.createElement('div');
@@ -749,9 +770,11 @@
       document.body.appendChild(t);
       setTimeout(()=>t.remove(), 1500);
     }
+
     // ---------- INIT ----------
     renderCategories();
     renderProducts();
+
     // Modal close with backdrop
     window.onclick = function(e){
       let cartModal = document.getElementById('cartModal');
